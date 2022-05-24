@@ -15,34 +15,61 @@ router.get('/post', async (req, res) => {
 });
 
 
-router.get('/post/:userId', async (req, res) => {
-  const { userId } = req.params;
-
-  const [content] = await Posts.find({ userId: userId });
-
-  res.json({
-    content,
-  });
-});
 
 router.post('/posts', async (req, res) => {
-  const { userId, title, name, content, pwd } = req.body;
+  const { postId, title, userName, content, pwd } = req.body;
 
-  const posts = await Posts.find({ userId });
+  const posts = await Posts.find({ postId });
   if (posts.length) {
     return res.status(400).
     json({ success: false, errorMassege: "이미 있는 데이터입니다." });
   }
 
   const createdPosts = await Posts.create({ 
-    userId, 
+    postId, 
     title, 
-    name, 
+    userName, 
     content,
+    date: new Date(),
+    pwd,
   });
 
-  res.json({ posts: createdPosts });
+  res.status(201).json({ 'result': 'success', 'msg': '등록되었습니다.' });
 });
 
+
+router.get('/post/:postId', async (req, res) => {
+  const { postId } = req.params;
+
+  const [content] = await Posts.find({ postId: Number(postId) });
+
+  res.json({
+    content,
+  });
+});
+
+router.delete('/post/:postId', async (req, res) => {
+  const { postId } = req.params;
+
+  const existsPosts = await Posts.find({ postId: Number(postId) });
+  if (existsPosts.length) {
+    await Posts.deleteOne({ postId: Number(postId) });
+  }
+
+  res.json({ success: true });
+});
+
+router.put('/post/:postId', async (req, res) => {
+  const { postId } = req.params;
+
+  const existsPosts = await Posts.find({ postId: Number(postId) });
+  if (!existsPosts.length) {
+    return res.status(400).json({ success: false, errorMassege: "수정"});
+  }
+
+  await Posts.updateOne({ postId: Number(postId)}, { $set: { content: content } });
+
+  res.json({ success: true});
+});
 
 module.exports = router;

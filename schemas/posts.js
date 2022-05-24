@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const postsSchema = mongoose.Schema({
-  userId: {
-    type: String,
+  postId: {
+    type: Number,
   },
   title: {
     type: String,
@@ -10,8 +10,13 @@ const postsSchema = mongoose.Schema({
   content: {
     type: String,
   },
-  date: {
+  userName: {
     type: String,
+  },
+  date: {
+    format:Date,
+    type: String,
+    required: true,
   },
   pwd: {
     type: String,
