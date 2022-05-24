@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/post', async (req, res) => {
-  const posts = await Posts.find();
+  const posts = await Posts.find().sort({date:-1});
   res.json({
     posts,
   })
@@ -41,35 +41,38 @@ router.post('/posts', async (req, res) => {
 router.get('/post/:postId', async (req, res) => {
   const { postId } = req.params;
 
-  const content = await Posts.findOne({ postId });
-
+  const posts = await Posts.findOne({ postId });
+console.log(posts)
   res.json({
-    content
+    posts
   });
 });
 
-router.delete('/post/:postId', async (req, res) => {
-  const { postId } = req.params;
+router.delete('/post/:postId/:pwd', async (req, res) => {
+  const { postId, pwd } = req.params;
 
-  const existsPosts = await Posts.find({ postId });
+  const existsPosts = await Posts.find({ postId, pwd });
   if (existsPosts.length) {
     await Posts.deleteOne({ postId });
+  } else {
+    return res.json({ success: false, errorMassege: "비밀번호가 일치하지 않습니다."})
   }
 
-  res.json({ success: true });
+  res.json({ success: true, 'msg': '삭제되었습니다.' });
 });
 
-router.put('/post/:postId', async (req, res) => {
-  const { postId } = req.params;
+router.put('/post/:postId/:pwd', async (req, res) => {
+  const { postId, pwd } = req.params;
+  const { content } = req.body;
 
-  const existsPosts = await Posts.find({ postId });
+  const existsPosts = await Posts.find({ postId, pwd });
   if (!existsPosts.length) {
-    return res.status(400).json({ success: false, errorMassege: "수정"});
+    return res.status(400).json({ success: false, errorMassege: "비밀번호가 일치하지 않습니다."});
   }
 
-  await Posts.updateOne({ postId }, { $set: { content: content } });
+  await Posts.updateOne({ postId }, { $set: { content } });
 
-  res.json({ success: true});
+  res.json({ success: "수정 완료"});
 });
 
 module.exports = router;
