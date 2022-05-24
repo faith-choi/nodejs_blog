@@ -41,19 +41,19 @@ router.post('/posts', async (req, res) => {
 router.get('/post/:postId', async (req, res) => {
   const { postId } = req.params;
 
-  const [content] = await Posts.find({ postId: Number(postId) });
+  const content = await Posts.findOne({ postId });
 
   res.json({
-    content,
+    content
   });
 });
 
 router.delete('/post/:postId', async (req, res) => {
   const { postId } = req.params;
 
-  const existsPosts = await Posts.find({ postId: Number(postId) });
+  const existsPosts = await Posts.find({ postId });
   if (existsPosts.length) {
-    await Posts.deleteOne({ postId: Number(postId) });
+    await Posts.deleteOne({ postId });
   }
 
   res.json({ success: true });
@@ -62,12 +62,12 @@ router.delete('/post/:postId', async (req, res) => {
 router.put('/post/:postId', async (req, res) => {
   const { postId } = req.params;
 
-  const existsPosts = await Posts.find({ postId: Number(postId) });
+  const existsPosts = await Posts.find({ postId });
   if (!existsPosts.length) {
     return res.status(400).json({ success: false, errorMassege: "수정"});
   }
 
-  await Posts.updateOne({ postId: Number(postId)}, { $set: { content: content } });
+  await Posts.updateOne({ postId }, { $set: { content: content } });
 
   res.json({ success: true});
 });
